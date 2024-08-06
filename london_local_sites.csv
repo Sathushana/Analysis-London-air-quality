@@ -1,0 +1,68 @@
+code,site,latitude,longitude,Parameter_name
+BT8,Brent - ARK Franklin Primary Academy,51.532405,-0.217719,Nitrogen dioxide
+BT8,Brent - ARK Franklin Primary Academy,51.532405,-0.217719,PM10 particulate matter (Hourly measured)
+BT6,Brent - John Keble Primary School,51.537799,-0.247793,Nitrogen dioxide
+BT6,Brent - John Keble Primary School,51.537799,-0.247793,PM10 particulate matter (Hourly measured)
+CT4,City of London - Beech Street,51.520225,-0.096106,Nitrogen dioxide
+CT4,City of London - Beech Street,51.520225,-0.096106,PM10 particulate matter (Hourly measured)
+CT3,City of London - Sir John Cass School,51.513847,-0.077766,Nitrogen dioxide
+CT3,City of London - Sir John Cass School,51.513847,-0.077766,PM10 particulate matter (Hourly measured)
+CT8,City of London - Upper Thames Street,51.509544,-0.087357,PM10 particulate matter (Hourly measured)
+CT6,City of London - Walbrook Wharf,51.510499,-0.091634,Nitrogen dioxide
+EI3,Ealing - Acton Vale,51.503853,-0.254668,Nitrogen dioxide
+EI3,Ealing - Acton Vale,51.503853,-0.254668,PM10 particulate matter (Hourly measured)
+EA6,Ealing - Hanger Lane Gyratory,51.53085,-0.292488,Nitrogen dioxide
+EA6,Ealing - Hanger Lane Gyratory,51.53085,-0.292488,PM10 particulate matter (Hourly measured)
+EI1,Ealing - Western Avenue,51.523608,-0.265503,Nitrogen dioxide
+EI1,Ealing - Western Avenue,51.523608,-0.265503,PM10 particulate matter (Hourly measured)
+GR7,Greenwich - Blackheath,51.472504,-0.012381,Nitrogen dioxide
+GR7,Greenwich - Blackheath,51.472504,-0.012381,PM10 particulate matter (Hourly measured)
+HK6,Hackney - Old Street,51.526454,-0.08491,Ozone
+HK6,Hackney - Old Street,51.526454,-0.08491,Nitrogen dioxide
+HK6,Hackney - Old Street,51.526454,-0.08491,PM10 particulate matter (Hourly measured)
+HK6,Hackney - Old Street,51.526454,-0.08491,PM2.5 particulate matter (Hourly measured)
+HS4,Hounslow Chiswick,51.492507,-0.257252,Nitrogen dioxide
+HS4,Hounslow Chiswick,51.492507,-0.257252,PM10 particulate matter (Hourly measured)
+HS4,Hounslow Chiswick,51.492507,-0.257252,PM2.5 particulate matter (Hourly measured)
+HS8,Hounslow Gunnersbury,51.500676,-0.284383,Nitrogen dioxide
+HS8,Hounslow Gunnersbury,51.500676,-0.284383,PM10 particulate matter (Hourly measured)
+LB5,Lambeth - Bondway Interchange,51.485487,-0.124545,Nitrogen dioxide
+LB5,Lambeth - Bondway Interchange,51.485487,-0.124545,Sulphur dioxide
+LB5,Lambeth - Bondway Interchange,51.485487,-0.124545,PM10 particulate matter (Hourly measured)
+LB4,Lambeth - Brixton Road,51.464114,-0.114581,Nitrogen dioxide
+LB4,Lambeth - Brixton Road,51.464114,-0.114581,PM10 particulate matter (Hourly measured)
+LW5,Lewisham - Deptford,51.479531,-0.025261,Nitrogen dioxide
+LW5,Lewisham - Deptford,51.479531,-0.025261,PM2.5 particulate matter (Hourly measured)
+LW4,Lewisham - Loampit Vale,51.464691,-0.016068,Nitrogen dioxide
+LW4,Lewisham - Loampit Vale,51.464691,-0.016068,PM10 particulate matter (Hourly measured)
+LW2,Lewisham - New Cross,51.474954,-0.039641,Nitrogen dioxide
+LW2,Lewisham - New Cross,51.474954,-0.039641,PM10 particulate matter (Hourly measured)
+LW2,Lewisham - New Cross,51.474954,-0.039641,PM2.5 particulate matter (Hourly measured)
+RI2,Richmond Upon Thames - Barnes Wetlands,51.476168,-0.230427,Ozone
+RI2,Richmond Upon Thames - Barnes Wetlands,51.476168,-0.230427,Nitrogen dioxide
+RI2,Richmond Upon Thames - Barnes Wetlands,51.476168,-0.230427,PM10 particulate matter (Hourly measured)
+RI1,Richmond Upon Thames - Castelnau,51.480189,-0.237335,Nitrogen dioxide
+RI1,Richmond Upon Thames - Castelnau,51.480189,-0.237335,PM10 particulate matter (Hourly measured)
+SK6,Southwark - Elephant and Castle,51.493156,-0.101527,Ozone
+SK6,Southwark - Elephant and Castle,51.493156,-0.101527,Nitrogen dioxide
+SK6,Southwark - Elephant and Castle,51.493156,-0.101527,PM10 particulate matter (Hourly measured)
+SK8,Southwark - Tower Bridge Road,51.501391,-0.078203,Nitrogen dioxide
+WAA,Wandsworth - Battersea,51.47944,-0.141787,Nitrogen dioxide
+WAA,Wandsworth - Battersea,51.47944,-0.141787,PM10 particulate matter (Hourly measured)
+WAC,Wandsworth - Lavender Hill (Clapham Jct),51.46369,-0.166713,Nitrogen dioxide
+WAC,Wandsworth - Lavender Hill (Clapham Jct),51.46369,-0.166713,PM10 particulate matter (Hourly measured)
+WA9,Wandsworth - Putney,51.465033,-0.215825,Nitrogen dioxide
+WA9,Wandsworth - Putney,51.465033,-0.215825,PM10 particulate matter (Hourly measured)
+WA7,Wandsworth - Putney High Street,51.463429,-0.215871,Nitrogen dioxide
+WA7,Wandsworth - Putney High Street,51.463429,-0.215871,PM10 particulate matter (Hourly measured)
+WA8,Wandsworth - Putney High Street Facade,51.463721,-0.21589,Nitrogen dioxide
+WMA,Westminster - Buckingham Palace Road,51.493233,-0.147392,Nitrogen dioxide
+WMC,Westminster - Cavendish Square,51.516802,-0.145657,Nitrogen dioxide
+GV2,Westminster - Duke Street (Grosvenor),51.513,-0.150913,Nitrogen dioxide
+GV1,Westminster - Ebury Street (Grosvenor),51.493492,-0.149906,Nitrogen dioxide
+WMD,Westminster - Elizabeth Bridge,51.492248,-0.147115,Nitrogen dioxide
+WMD,Westminster - Elizabeth Bridge,51.492248,-0.147115,PM2.5 particulate matter (Hourly measured)
+GV3,Westminster - Mount Street (Grosvenor),51.513,-0.150913,Nitrogen dioxide
+WM6,Westminster - Oxford Street,51.513929,-0.152793,Nitrogen dioxide
+WMB,Westminster - Oxford Street East,51.516066,-0.135164,Nitrogen dioxide
+NB1,Westminster - Strand (Northbank BID),51.51197,-0.116713,Nitrogen dioxide
