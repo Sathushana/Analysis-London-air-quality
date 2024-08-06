@@ -1,0 +1,802 @@
+---
+title: "AirMoniteringProject"
+author: "S18809"
+date: "1/23/2024"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tinytex)
+```
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+library(janitor)
+```
+
+```{r}
+library(skimr)
+```
+
+```{r}
+library(lubridate)
+```
+
+```{r}
+library(corrplot)
+```
+
+
+# Load the Data sets for london_local_data
+
+```{r}
+col_types <- "cccdddddddd"
+air_data <- read_csv(file = "../Data/london_local_data_2022.csv",col_types = col_types)
+```
+
+# Find the dimension of the data
+```{r}
+dim(air_data)
+```
+
+```{r}
+air_data %>%
+  slice_head(n = 6)
+```
+
+
+# Remove the empty rows and cols
+```{r}
+air_data <- air_data %>%
+              remove_empty(c("cols","rows"))
+```
+
+
+```{r}
+# skim(air_data)
+```
+
+# Find the Summary of the data set
+```{r}
+summary(air_data)
+```
+
+```{r}
+glimpse(air_data)
+```
+
+# Change the date time in date types
+```{r}
+air_data <- air_data %>% 
+              mutate(date = ymd_hms(date))
+```
+
+```{r}
+glimpse(air_data)
+```
+
+#  Create new columns for date occurrence and time occurrence in the data frame.
+```{r}
+air_data <- air_data %>%
+            mutate(dateOcc = as.Date(date),
+            timeOcc = format(date,format = "%H"))
+```
+
+
+```{r}
+glimpse(air_data)
+```
+
+# Load the date set in local site
+```{r}
+col_types_s <- "ccddc"
+site_data <- read_csv(file = "../Data/london_local_sites.csv",col_types = col_types_s)
+```
+
+# Find the dimension of the data
+```{r}
+dim(site_data)
+```
+```{r}
+site_data %>%
+  slice_head(n = 6)
+```
+
+```{r}
+#skim(site_area)
+```
+
+
+# Find the unique value in site and code
+```{r}
+length(unique(site_data$site));length(unique(site_data$code))
+```
+
+# Find the latitude and longitude in each code
+```{r}
+site_area <- site_data %>%
+  select(code,latitude,longitude)
+```
+
+
+# Find the dimension of site area data set
+```{r}
+dim(site_area)
+```
+
+```{r}
+# skim(site_area)
+```
+
+
+# Find the number of unique values for each column in the data set 
+```{r}
+length(unique(site_area$latitude));length(unique(site_area$code));length(unique(site_area$longitude))
+```
+
+# Remove the duplicate values
+```{r}
+site_area <- distinct(site_area)
+```
+
+
+```{r}
+dim(site_area)
+```
+
+```{r}
+#skim(site_area)
+```
+
+# Merge the "air" data frame and the "site_area" data frame in the data set
+```{r}
+air_data %>%
+  slice_head(n = 6)
+```
+
+```{r}
+site_area %>%
+  slice_head(n = 6)
+```
+
+
+```{r}
+length(unique(air_data$code))
+```
+
+```{r}
+air_meta_data <- merge(air_data,site_area,by = "code",all.x = TRUE) 
+```
+
+
+```{r}
+#skim(air_meta_data)
+```
+
+```{r}
+glimpse(air_meta_data)
+```
+# Find the summary of the data frame "air_meta_data."
+
+```{r}
+summary(air_meta_data)
+```
+
+# Create the new variable for the month 
+```{r}
+air_meta_data <- air_meta_data %>%
+                 mutate(month = month(dateOcc,label = TRUE))
+```
+
+# Convert the time occurrences from 00 to 24 hours.
+```{r}
+air_meta_data <- air_meta_data %>%
+                  mutate(timeOcc = ifelse(timeOcc == "00","24",timeOcc))
+```
+
+```{r}
+air_meta_data %>%
+  slice_head(n = 2)
+```
+# Create a new data frame for the average measurement of each air gas at each site in London.
+```{r}
+longitude_data<- air_meta_data %>%
+          group_by(longitude) %>%
+            summarise(nox = mean(nox,na.rm = TRUE),
+            no2  = mean(no2,na.rm = TRUE),
+            no = mean(no,na.rm = TRUE),
+            pm10 = mean(pm10,na.rm = TRUE),
+            o3 = mean(o3,na.rm = TRUE),
+            pm2_5 = mean(pm2_5,na.rm = TRUE),
+            so2 = mean(so2,na.rm = TRUE))
+```
+
+```{r}
+#skim(longitude_data)
+```
+
+# Replace the null values with zero
+```{r}
+longitude_data <- replace(longitude_data,is.na(longitude_data),0)
+```
+
+```{r}
+#skim(longitude_data)
+```
+
+# Create the correlation matrix between each variable.
+```{r}
+cor_matrix<- cor(longitude_data)
+```
+
+```{r}
+cor_matrix
+```
+# Draw a corrplot for the above correlation matrix.
+```{r}
+
+relation <- corrplot(cor_matrix,
+         method = "number",
+         tl.col = "black",
+         type = "upper")
+relation
+```
+
+```{r}
+postscript(file = "relation.eps",width = 6,height = 4,horizontal = FALSE)
+dev.off()
+```
+
+
+```{r}
+glimpse(air_meta_data)
+```
+
+# Create a new data frame for the sum of spread of all gases in London city.
+```{r}
+air_gas<- air_meta_data %>%
+            summarise(nox = sum(nox,na.rm = TRUE),
+            no2 = sum(no2,na.rm = TRUE),
+            no = sum(no,na.rm = TRUE),
+            pm10 = sum(pm10,na.rm = TRUE),
+            o3 = sum(o3,na.rm = TRUE),
+            pm2_5 = sum(pm2_5,na.rm = TRUE),
+            so2 = sum(so2,na.rm = TRUE))
+```
+
+
+```{r}
+air_gas
+```
+
+
+```{r}
+colnames(air_gas) <- NULL
+measurement <-t(air_gas[, 1:7])
+measurement
+```
+```{r}
+# Create the data frame
+gases <- c("nox","no2","no","pm10","o3","pm2_5","So2")
+ airGas<- data.frame(gases,measurement)
+```
+
+```{r}
+airGas<- airGas %>%
+        mutate(percent = round(measurement/sum(measurement) * 100,digits = 2))
+```
+
+
+```{r}
+airGas
+```
+
+
+```{r}
+# Draw the Bar Chart For all gases spread within year
+airGas %>%
+  ggplot(mapping = aes(x = gases, y = percent, fill = gases)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = paste0(percent, "%")),
+            position = position_stack(vjust = 0.5),
+            size = 3, color = "black") +
+  theme_minimal() +
+  ggtitle("Gas Percentages in London Over the Year") +
+  theme(
+    plot.title = element_text(hjust = 0.5, vjust = 0.1),
+    axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis labels for better readability
+  )
+```
+
+#Create a new data frame for the average values of each air pollutant based on the month in London local sites.
+```{r}
+glimpse(air_meta_data)
+```
+
+
+```{r}
+air_mean_data<- air_meta_data %>%
+                  group_by(month) %>%
+                  summarise(nox = mean(nox,na.rm = TRUE),
+                  no2  = mean(no2,na.rm = TRUE),
+                  no = mean(no,na.rm = TRUE),
+                  pm10 = mean(pm10,na.rm = TRUE),
+                  o3 = mean(o3,na.rm = TRUE),
+                  pm2_5 = mean(pm2_5,na.rm = TRUE),
+                  so2 = mean(so2,na.rm = TRUE)
+            )
+```
+
+
+```{r}
+air_mean_data
+```
+# Draw a line chart for the average measurement of each gas based on each month in London.
+```{r}
+air_mean_data %>% 
+  ggplot(mapping = aes(x = month,group = 1))+
+  geom_line(aes(y = nox,color = "nox"))+
+  geom_line(aes(y = no2,color = "no2"))+
+  geom_line(aes(y = no,color = "no"))+
+  geom_line(aes(y = pm10,color = "pm10"))+
+  geom_line(aes(y = o3,color = "o3"))+
+  geom_line(aes(y = pm2_5,color = "pm2_5"))+
+  geom_line(aes(y = so2,color = "so2"))+
+  theme_minimal()+
+  scale_color_manual(values = c("nox" = "green",
+                                "no2" = "red",
+                                "no" = "blue",
+                                "pm10" = "yellow",
+                                "o3" = "orange",
+                                "pm2_5" = "purple",
+                                "so2" = "black"), name = "AirGases")+
+  ggtitle("Line chart for Average air measurment for each gases")+
+  ylab("Average")
+```
+
+# Find the average value for each gas based on each local site.
+```{r}
+ air_meta_data %>%
+  group_by(code) %>%
+  summarise(nox = mean(nox,na.rm = TRUE),
+  no2  = mean(no2,na.rm = TRUE),
+  no = mean(no,na.rm = TRUE),
+  pm10 = mean(pm10,na.rm = TRUE),
+  o3 = mean(o3,na.rm = TRUE),
+  pm2_5 = mean(pm2_5,na.rm = TRUE),
+  so2 = mean(so2,na.rm = TRUE))
+```
+
+# Create a data frame for the nitrogen group in local sites.
+```{r}
+nitrogen_group <- air_meta_data %>%
+  select(site,code,nox,no2,no,date,timeOcc,month)
+```
+
+
+```{r}
+#skim(nitrogen_group)
+```
+
+# Find the summary statistics for the nitrogen group.
+```{r}
+summary(nitrogen_group)
+```
+
+# Remove the null values from data frame.
+```{r}
+nitrogen_group <- nitrogen_group %>%
+                  drop_na()
+```
+
+
+```{r}
+#skim(nitrogen_group)
+```
+
+```{r}
+glimpse(nitrogen_group)
+```
+
+# Calculate the average measurement for nitrogen oxide (NOx) and identify the maximum measurement for each month with  for site.
+
+```{r}
+nitrogen_group %>%
+  group_by(month,code) %>%
+  summarise(Avg_nox = mean(nox)) %>%
+  arrange(desc(Avg_nox)) %>%
+  slice(1)
+```
+# Add a new variable 'weeks' to the data frame
+```{r}
+nitrogen_group <-  nitrogen_group %>%
+                      mutate(weeks = weekdays(date))
+```
+
+
+# Draw boxplots for air measurements in January, August, September, October, November, and December at sites EA6, LB4, and LW4 based on weeks
+```{r}
+nitrogen_group %>%
+  filter(code %in% c("EA6","LB4","LW4"),
+         month %in% c("Jan","Aug","Sep","Oct","Nov","Dec")) %>%
+  group_by(weeks) %>%
+  ggplot(mapping = aes(x = weeks,y = nox,fill = code)) +
+  geom_boxplot()+
+  scale_fill_discrete("code",label = c("EA6" = "Ealing - Hanger Lane Gyratory","LB4" = "Lambeth - Brixton Road","LW4" = "Lewisham - Loampit Vale"))+
+  ggtitle("Box plot for  measurement vs weeksdays in nox in 3 sites")+
+  ylab("Measurement")
+```
+
+
+```{r}
+nitrogen_group %>%
+  slice_head(n = 2)
+```
+
+
+# Draw a scatter plot for the average measurement of nitrogen oxide on Thursday and Friday in January and October based on hours.
+```{r}
+nitrogen_group %>%
+  filter(month %in% c("Jan","Oct"),
+         weeks %in% c("Thursday","Friday")) %>%
+  group_by(timeOcc,weeks) %>%
+  summarise(avg_nox = mean(nox)) %>%
+  ggplot(mapping = aes(x = timeOcc, y = avg_nox,color = weeks)) +
+  geom_point()+
+  labs(title = "Average NOx by Time Occurrence and Weekday(Thursday & Friday)",
+       x = "Time Occurrence", y = "Average NOx",
+       color = "Weekday") +
+  theme_minimal()
+```
+
+# Find the maximum measurement of nitrogen dioxide in areas with high dispersion in January, March, and December.
+```{r}
+nitrogen_group %>%
+  filter(month %in% c("Jan","Mar","Dec")) %>%
+  group_by(month,code) %>%
+  summarise(avg_no2 = mean(no2)) %>%
+  arrange(desc(avg_no2)) %>%
+  slice(1)
+```
+
+# Find the maximum measurement of Nitric Oxide in areas with high dispersion in January and December
+```{r}
+nitrogen_group %>%
+  filter(month %in% c("Jan","Dec")) %>%
+  group_by(month,code) %>%
+  summarise(avg_no = mean(no)) %>%
+  arrange(desc(avg_no)) %>%
+  slice(1)
+```
+# Find the minimum measurement of Nitric Oxide in areas with high dispersion in January and December
+```{r}
+nitrogen_group %>%
+  filter(month %in% c("Jan","Dec")) %>%
+  group_by(month,code) %>%
+  summarise(avg_no = mean(no)) %>%
+  arrange(avg_no) %>%
+  slice(1)
+```
+# Determine the Trend for nitrogen gases for each site
+```{r}
+
+nitrogen_group %>%
+  group_by(code) %>%
+  summarise(avg_nox = mean(nox),
+            avg_no2 = mean(no2),
+            avg_no = mean(no)) %>%
+  ggplot(aes(x = code,group = 1)) +
+  geom_line(aes(y = avg_nox , color = "nox"))+
+  geom_line(aes(y = avg_no , color = "no"))+
+  geom_line(aes(y = avg_no2 , color = "no2"))+
+  theme(
+    axis.text.x = element_text(angle = 90, vjust = 0.5)
+  )+
+  ggtitle("Line chart for trend in nitrogen group in each code")+
+  ylab("Average Measurement")+
+  scale_color_manual(values = c("nox" = "Red",
+                                "no" = "Blue",
+                                "no2" = "Green"),name = "nitrogen_gases")
+  
+```
+
+```{r}
+glimpse(air_meta_data)
+```
+
+# Create a new data frame for the ocean gas
+```{r}
+ocen_group <- air_meta_data %>%
+  select(code,dateOcc,timeOcc,o3,month)
+```
+
+```{r}
+#skim(ocen_group)
+```
+
+# Remove the null values
+```{r}
+ocen_group <- ocen_group %>%
+  drop_na()
+```
+
+# Create a new variable for weeks in the ocean group data frame
+```{r}
+ocen_group <- ocen_group %>%
+              mutate(weeks = weekdays(dateOcc))
+```
+
+```{r}
+head(ocen_group,2)
+```
+
+# Find the maximum measurement of ocen gas in areas with high dispersion in Febuary,April and Augest.
+```{r}
+ocen_group %>%
+  filter(month %in% c("Feb","Apr","Aug")) %>%
+  group_by(month,code) %>%
+  summarise(avg_o3 = mean(o3)) %>%
+  arrange(desc(avg_o3)) %>%
+  slice(1)
+```
+# Determine which area has the maximum amount of O3 spread.
+```{r}
+ocen_group %>%
+  filter(o3 == max(o3))
+```
+
+# Calculate the weekly spread of ozone in Richmond Upon Thames - Barnes Wetlands
+```{r}
+weeks_mesure_o3<- ocen_group %>% 
+                      filter(code == "RI2") %>%
+                      group_by(weeks) %>%
+                      summarise(measurement = sum(o3))
+
+```
+
+
+```{r}
+weeks_mesure_o3
+```
+
+# Add a new variable for percentage columns in each days
+```{r}
+weeks_mesure_o3 <- weeks_mesure_o3 %>%
+                  mutate(percentage = round((measurement*100/sum(measurement)),digits = 2))
+
+```
+
+# Draw the pie chart for ozone measurements each week in Richmond Upon Thames - Barnes Wetlands
+```{r}
+weeks_mesure_o3 %>%
+  ggplot(mapping = aes(x = " ", y = measurement,fill = weeks))+
+  geom_bar(stat = "identity", width = 1,show.legend = FALSE) +
+  coord_polar(theta = "y")+
+  geom_text(aes(label = paste0(weeks, "\n", percentage, "%")), position = position_stack(vjust = 0.5)) +
+  theme_void()+
+  ggtitle("Pie chart for ozone (O3) measurements each week in \n Richmond Upon Thames - Barnes Wetlands")+
+  theme(
+    plot.title = element_text(hjust = 0.5,vjust = 0.1)
+  )
+  
+```
+
+```{r}
+ocen_group %>%
+  slice_head(n = 2)
+```
+
+
+# Find the trends for hourly measurements on Satuday in Richmond Upon Thames - Barnes Wetlands.
+```{r}
+ocen_group %>%
+  filter(code == "RI2",weeks == "Saturday") %>%
+  group_by(timeOcc) %>%
+  summarise(avg = mean(o3)) %>%
+  ggplot(aes(x = timeOcc,y = avg,group = 1)) +
+  geom_line(aes(color = "ozone"),size = 1.2)+
+  labs(title =  "Average Ozone Levels over Time \n (Location: Richmond Upon Thames - Barnes Wetlands, Saturday)",
+       x = "Time Occurance",
+       y = "Ozone Levels")+
+  scale_color_manual(values = c("ozone" = "red"),name = "Air Gas")
+```
+
+
+```{r}
+glimpse(air_meta_data)
+```
+# Create the new data frame for pm_10 gas measurement in London sity
+```{r}
+pm_10 <- air_meta_data %>%
+  select(code,month,pm10)
+```
+
+# Remove the null values
+```{r}
+pm_10 <- pm_10 %>%
+  drop_na()
+```
+
+```{r}
+#skim(pm10)
+```
+
+# Find the areas with the spread of PM_10 in London within one year.
+```{r}
+pm_10 %>%
+  group_by(code) %>%
+  summarise(measurement = sum(pm10)) %>%
+  arrange(desc(measurement))
+```
+
+# Find the top 5 areas with the maximum spread of PM10 in London within one year
+
+```{r}
+pm_10 %>%
+  group_by(code) %>%
+  summarise(measurement = sum(pm10)) %>%
+  slice_max(measurement,n = 5)
+```
+
+
+# Draw a bar chart for the spread levels of PM10 in the top 5 areas, organized by month.
+```{r}
+pm_10 %>%
+  filter(code %in% c("LB5","EI1","HS8","WAA","LW4")) %>%
+  group_by(month,code) %>%
+  summarise(measurement = sum(pm10)) %>%
+  ggplot(aes(x = month,y = measurement,fill = code)) +
+  geom_bar(stat = "identity",position = "dodge")+
+  scale_fill_discrete("Sites",label = c("LB5" = "Lambeth - Bondway Interchange",
+                                        "EI1" = "Ealing - Western Avenue",
+                                        "HS8" = "Hounslow Gunnersbury",
+                                        "WAA" = "Wandsworth - Battersea",
+                                        "LW4" = "Lewisham - Loampit Vale"))+
+  ggtitle("Barplot pm_10 for top 5 sites")
+```
+
+
+
+```{r}
+glimpse(air_meta_data)
+```
+
+# Create the new  data frame for measurement in pm2_5 gas 
+```{r}
+pm_2.5 <- air_meta_data %>%
+  select(site,code,dateOcc,timeOcc,month,pm2_5)
+```
+
+
+```{r}
+#skim(pm_2.5)
+```
+
+# Remove the null values
+```{r}
+pm_2.5 <- pm_2.5 %>%
+  drop_na()
+```
+
+# Find the maximum average measurement of pm_2.5 in areas with high dispersion in month
+
+```{r}
+unique(pm_2.5$code)
+```
+
+
+```{r}
+pm_2.5 %>%
+  group_by(code,month) %>%
+  summarise(avg_measure = mean(pm2_5)) %>%
+  arrange(desc(avg_measure)) %>%
+  slice(1)
+```
+
+```{r}
+# Identify the trend for pm2_5 gases on January and March in 3 sites
+pm_2.5 %>%
+  filter(month %in% c("Jan","Mar")) %>%
+  mutate(weeks = weekdays(dateOcc)) %>% # Create the variables for weeks
+  group_by(weeks,code) %>%
+  ggplot(aes(x = weeks , y = pm2_5,fill = code))+
+  geom_boxplot()+
+  scale_fill_discrete("code",label = c("HK6" = "Hackney - Old Street",
+                                       "HS4" = "Hounslow Chiswick",
+                                       "WMD" = "Westminster - Elizabeth Bridge"))+
+  ggtitle("Box plot for pm2_5 air gases in each day")
+```
+
+
+```{r}
+# Create the line chart for measure level in pm2_5 on Tuesday
+pm_2.5 %>%
+ mutate(weeks = weekdays(dateOcc)) %>% # Create the variables for weeks
+  filter(weeks == "Tuesday") %>% 
+  group_by(timeOcc) %>%
+  summarise(avg_pm25 = mean(pm2_5)) %>%
+  ggplot(aes(x = timeOcc , y = avg_pm25 , group = 1))+
+  geom_line()+
+  ggtitle("Line chart for average measurement level in Tuesday")+
+  ylab("pm2_5")+
+  xlab("hours")
+  
+```
+
+
+
+```{r}
+glimpse(air_meta_data)
+```
+
+# Create the new data frame for measurement of so2 gas in London
+```{r}
+so_2 <- air_meta_data %>%
+  select(code,so2,dateOcc,month)
+```
+
+# Remove the null values
+```{r}
+so_2 <- so_2 %>%
+  drop_na()
+```
+
+
+```{r}
+summary(so_2)
+```
+# Find the site in London where the SO2 gas has disappeared.
+```{r}
+so_2 %>%
+  group_by(code) %>%
+  summarise(measure = sum(so2)) 
+```
+# Draw a line chart to illustrate the spread of SO2 levels each month in Lambeth - Bondway Interchange
+```{r}
+so_2 %>%
+  group_by(code,month) %>%
+  summarise(measure = sum(so2)) %>%
+  ggplot(mapping = aes(x = month, y = measure,group = 1))+
+  geom_line(aes(color = code))
+```
+
+# Check whether there are any streets where all gases have spread
+```{r}
+air_meta_data[complete.cases(air_meta_data),]
+```
+
+# Check whether there are any streets where all gases have spread without so2 gas
+```{r}
+air_meta_data %>%
+  select(code,no2,nox,no,pm10,o3,pm2_5) %>%
+  drop_na() %>%
+  group_by(code) %>%
+  summarise(nox = mean(nox),
+            no2 = mean(no2),
+            no = mean(no),
+            pm10 = mean(pm10),
+            o3 = mean(o3),
+            pm2_5 = mean(pm2_5))
+```
+# Calculate the average measurement for each gas in Lambeth - Bondway Interchange.
+```{r}
+air_meta_data %>%
+  filter(code == "LB5") %>%
+  group_by(code) %>%
+  summarise(nox = mean(nox,na.rm = TRUE),
+            no2 = mean(no2,na.rm = TRUE),
+            no = mean(no,na.rm = TRUE),
+            pm10 = mean(pm10,na.rm = TRUE),
+            o3 = mean(o3,na.rm = TRUE),
+            pm2_5 = mean(pm2_5,na.rm = TRUE),
+            so2 = mean(so2,na.rm = TRUE))
+```
+
+
